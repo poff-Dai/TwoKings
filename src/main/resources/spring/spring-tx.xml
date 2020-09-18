@@ -1,0 +1,49 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+        <context:component-scan base-package="com.bjpowernode.*"/>
+        <context:property-placeholder location="classpath:properties/*.properties"/>
+
+        <!--配置数据库连接池-->
+        <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+            <property name="driverClassName" value="${mysql.driver}"/>
+            <property name="url" value="${mysql.url}"/>
+            <property name="username" value="${mysql.username}"/>
+            <property name="password" value="${mysql.password}"/>
+            <property name="maxActive" value="${mysql.maxId}"/>
+            <property name="minIdle" value="${mysql.minId}"/>
+        </bean>
+
+        <!--配置sqlsession-->
+        <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+            <property name="dataSource" ref="dataSource"/>
+            <property name="configLocation" value="classpath:mybatis/mybatis.xml"/>
+            <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+        </bean>
+
+        <!--动态代理实现接口实现类-->
+        <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+            <property name="basePackage" value="com.bjpowernode.*.mapper"/>
+        </bean>
+
+        <!--事务管理者-->
+        <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+            <property name="dataSource" ref="dataSource"/>
+        </bean>
+        <!--开启事务注解驱动-->
+        <tx:annotation-driven transaction-manager="transactionManager"/>
+
+
+</beans>
